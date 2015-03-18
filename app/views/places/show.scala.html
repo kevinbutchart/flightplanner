@@ -1,0 +1,8 @@
+@(place: Place)
+
+@import helper._
+@import models.Place
+
+@main(place.name) {
+  <h1>Place Name: "@place.name" Latitude: "@place.latitude" Longitude: "@place.longitude"</h1>
+}

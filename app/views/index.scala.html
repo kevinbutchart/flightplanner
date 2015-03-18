@@ -1,0 +1,34 @@
+@(places: List[Place])
+
+@main("Listing places") {
+	<div class="container">
+	    <h1>places: @places.length </h1>
+	    <a href="@routes.PlacesController.add" class="btn btn-primary">Add Place</a>
+	    <table class="table table-striped">
+		    <thead>
+		    	<tr>
+		    		<th>ID</th>
+					<th>Name</th>
+					<th>Latitude</th>
+					<th>Longitude</th>
+					<th>Edit</th>
+					<th>Delete</th>
+		    	</tr>
+		    </thead>
+			<tbody>
+				@for(place <- places) {
+				<tr>
+					<td>@place.id</td>
+					<td>@place.name</td>
+					<td>@place.prettyLatitude</td>
+					<td>@place.prettyLongitude</td>
+						@place.id.map { id =>
+							<td><a href="@routes.PlacesController.edit(id)" class="btn btn-warning" type="submit">Edit</button></td>
+							<td>@helper.form(routes.PlacesController.delete(id)){<button class="btn btn-danger" type="submit">Delete</button>}</li></td>
+						}
+				</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
