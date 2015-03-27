@@ -9,12 +9,27 @@ GET     /                           controllers.Application.index
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 GET   /places                        controllers.PlacesController.index
-
 POST  /places                        controllers.PlacesController.save
-
 GET   /places/add                  controllers.PlacesController.add
-
 GET  /places/:id             		controllers.PlacesController.show(id: Int)
 POST  /places/:id             		controllers.PlacesController.update(id: Int)
 GET   /places/:id/edit				controllers.PlacesController.edit(id: Int)
 POST  /places/:id/delete			controllers.PlacesController.delete(id: Int)
+
+GET   /journeys                      controllers.JourneysController.index
+POST  /journeys                      controllers.JourneysController.save
+GET   /journeys/add                  controllers.JourneysController.add
+GET  /journeys/:id             		 controllers.JourneysController.show(id: Int)
+POST  /journeys/:id             		controllers.JourneysController.update(id: Int)
+GET   /journeys/:id/edit				controllers.JourneysController.edit(id: Int)
+POST  /journeys/:id/delete			controllers.JourneysController.delete(id: Int)
+
+GET   /flightplan                      controllers.FlightPlanController.index
+POST  /flightplan                       controllers.FlightPlanController.save
+POST  /flightplan/saveWind              controllers.FlightPlanController.saveWind
+GET   /flightplan/:jid/add              controllers.FlightPlanController.add(jid: Int)
+GET   /flightplan/addWind               controllers.FlightPlanController.addWind
+GET  /flightplan/:id             		controllers.FlightPlanController.show(id: Int)
+POST  /flightplan/:id             		controllers.FlightPlanController.update(id: Int)
+GET   /flightplan/:id/edit				controllers.FlightPlanController.edit(id: Int)
+POST  /flightplan/:id/delete			controllers.FlightPlanController.delete(id: Int)

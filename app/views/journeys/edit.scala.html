@@ -1,0 +1,19 @@
+@(id: Int, journeyForm: Form[Journey])
+
+@import helper._
+@import models.Journey
+
+@main("Edit Journey") {
+  <row>
+  	<div class="col-md-4"></div>
+  	<div class="col-md-4">
+  		<h1>Edit User</h1>
+  		 @form(routes.JourneysController.update(id)) {
+		      @inputText(journeyForm("name"))
+		      <button type="submit" class="btn btn-primary">Save</button>
+		  }
+  	</div>
+  	<div class="col-md-4"></div>
+  </row>
+
+}

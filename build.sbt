@@ -1,4 +1,4 @@
-name := """play-heroku-seed"""
+name := """flightplanner"""
 
 version := "1.0-SNAPSHOT"
 

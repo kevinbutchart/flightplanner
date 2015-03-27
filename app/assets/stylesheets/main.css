@@ -1,0 +1,32 @@
+@page {
+   size: 297mm 210mm;
+   margin: 0mm 0mm 0mm 0mm;
+}
+
+@media print {
+    body {
+        margin: 1em;
+        padding: 0;
+        line-height: 1.4em;
+        word-spacing: 1px;
+        letter-spacing: 0.2px;
+        font: 13px Arial, Helvetica,"Lucida Grande", serif;
+        color: #000;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
+.masthead {
+  background-color: @brand-primary;
+}
+
+
+td {
+    height: 25px;
+}
+
+th {
+    height: 25px;
+}
+
+.bg { background-color: #f7fb02; width: 100%; height: 100%; display: block; }

@@ -1,0 +1,19 @@
+@(journeyForm: Form[Journey])
+
+@import helper._
+@import models.Journey
+
+@main("Add a new Journey") {
+  <div class="row">
+	  <div class="col-md-4"></div>
+	  <div class="col-md-4">
+	  <h1>Add a new Journey</h1>
+	  	  @form(routes.JourneysController.save) {
+		      @inputText(journeyForm("name"))
+		      <button type="submit" class="btn btn-primary">Save</button>
+		  }
+	  </div>
+	  <div class="col-md-4"></div>
+	</div>
+
+}

@@ -1,0 +1,27 @@
+@(windForm: Form[Wind])
+
+@import helper._
+@import models.Journey
+@import models.Leg
+@import models.Places
+@import models.Winds
+@import models.Wind
+
+@main("Add a  Wind Forcast") {
+
+  <div class="row">
+	  <div class="col-md-4"></div>
+	  <div class="col-md-4">
+	  <h1>Add a new Wind Forecast</h1>
+	  	  @form(routes.FlightPlanController.saveWind) {
+            @select(windForm("altitude"), options(List("2000","5000")))
+            @inputText(windForm("direction"))
+            @inputText(windForm("speed"))
+            @inputText(windForm("oat"))
+            <button type="submit" class="btn btn-primary">Save</button>
+		  }
+	  </div>
+	  <div class="col-md-4"></div>
+	</div>
+
+}

@@ -1,0 +1,24 @@
+@(journey: Int, legForm: Form[Leg])
+
+@import helper._
+@import models.Journey
+@import models.Leg
+@import models.Places
+
+@main("Add a new Journey Leg") { 
+
+  <div class="row">
+	  <div class="col-md-4"></div>
+	  <div class="col-md-4">
+	  <h1>Add a new Journey</h1>
+	  	  @form(routes.FlightPlanController.save) {
+	  	      <input type="hidden" name="journeyId" value="@journey" />
+              @select(legForm("from"), Places.all.map(p => {p.id.get.toString -> p.name})))
+              @select(legForm("to"), Places.all.map(p => {p.id.get.toString -> p.name})))
+		      <button type="submit" class="btn btn-primary">Save</button>
+		  }
+	  </div>
+	  <div class="col-md-4"></div>
+	</div>
+
+}

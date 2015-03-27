@@ -11,9 +11,14 @@ import play.api.Play.current
 import scala.slick.driver.PostgresDriver.simple._
 import models.Place
 import models.Places
+import models.Journeys
 
 object Application extends Controller {
-  	def index = Action {
-		  Ok(views.html.index(Places.all))
-	}
+  def index = Action {
+    Ok(views.html.index(Places.all))
+  }
+
+  def journeysindex = Action {
+    Ok(views.html.journeysindex(Journeys.all, Places.all))
+  }
 }
