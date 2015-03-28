@@ -1,5 +1,4 @@
 @REM activator launcher script
-@REM
 @REM Environment:
 @REM In order for Activator to work you must have Java available on the classpath
 @REM JAVA_HOME - location of a JDK home dir (optional if java on path)
