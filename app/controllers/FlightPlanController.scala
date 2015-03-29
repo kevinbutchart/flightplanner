@@ -43,6 +43,7 @@ object FlightPlanController extends Controller {
 		  Ok(views.html.flightplanindex(currentJourney))
 	}
 	def show(id:Int) = Action {
+    System.out.println("journey: "+id)
 	    currentJourney = id
 		Ok(views.html.flightplanindex(currentJourney))
 	}

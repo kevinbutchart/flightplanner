@@ -1,7 +1,13 @@
 @(choice : Int)
 
+<script>
+function reloadFunction(s) {
+    var newChoice = s[s.selectedIndex].value;
+    location.href=newChoice;
+}
+</script>
+
 @main("Listing journeys") {
-    <script src="@routes.Assets.at("javascripts/update.js")" type="text/javascript"></script>
     <link rel='stylesheet' type='text/css' href="@routes.Assets.at("stylesheets/main.css")" >
 
 	<div class="container">
@@ -10,12 +16,12 @@
 	    <a href="@routes.FlightPlanController.add(choice)" class="btn btn-primary">Add Leg</a>
 	    <p/>
         <p>
-	    <select id="journeyChoice" onchange="updateFlightPlan()" >
+	    <select id="journeyChoice" onchange="reloadFunction(this)" >
 	    @for(journey <- Journeys.all) {
 	        @if(journey.id.get==choice) {
-	            <option value="@journey.id" selected>@journey.name</option>
+	            <option value="@routes.FlightPlanController.show(journey.id.get)" selected>@journey.name</option>
 	        } else {
-	            <option value="@journey.id">@journey.name</option>
+	            <option value="@routes.FlightPlanController.show(journey.id.get)">@journey.name</option>
 	        }    
         }
         </select>

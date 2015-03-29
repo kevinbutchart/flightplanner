@@ -21,4 +21,23 @@ object Application extends Controller {
   def journeysindex = Action {
     Ok(views.html.journeysindex(Journeys.all, Places.all))
   }
+
+//  def javascriptRoutes() = {
+//    response().setContentType("text/javascript")
+//    return ok(
+//      Routes.javascriptRouter("jsRoutes",
+//        controllers.routes.javascript.FlightPlanController.show()
+//      )
+//    )
+//  }
+
+  def javascriptRoutes = Action { implicit request =>
+    import routes.javascript._
+    Ok(
+      Routes.javascriptRouter("jsRoutes"){
+        controllers.routes.javascript.FlightPlanController.show
+        controllers.routes.javascript.PlacesController.index
+      }
+    ).as("text/javascript")
+  }
 }
