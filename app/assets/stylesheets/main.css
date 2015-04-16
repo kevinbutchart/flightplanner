@@ -53,3 +53,7 @@ select::-moz-focus-inner { /*Remove button padding in FF*/
         line-height:30px;
     }
 }
+
+.navbar.transparent.navbar-inverse .navbar-inner {
+   background: rgba(0,0,0,0.4);
+}

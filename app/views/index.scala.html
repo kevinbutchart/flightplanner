@@ -29,6 +29,18 @@
 				</tr>
 				}
 			</tbody>
+            <tbody>
+            @for(ms <- MetarStations.allWith(50.5,55.5,-6,1)) {
+            <tr>
+                <td>@ms.id</td>
+                <td>@ms.icao</td>
+                <td>@ms.name</td>
+                <td>@ms.place.prettyLatitude</td>
+                <td>@ms.place.prettyLongitude</td>
+                <td>@ms.elevation</td>
+            </tr>
+            }
+            </tbody>
 		</table>
 	</div>
 }

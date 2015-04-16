@@ -11,10 +11,13 @@ import play.api.Play.current
 import scala.slick.driver.PostgresDriver.simple._
 import models.Place
 import models.Places
+import models.MetarStations
 import utils.DoubleFormat._
 
 
 object PlacesController extends Controller {
+    MetarStations.updateList()
+    
 	val PlaceForm = Form(
 	    mapping(
 	        "name" -> text,

@@ -4,8 +4,11 @@
 <head>
 <meta charset="utf-8">
 <title>Flight Planner</title>
-
+<!--
 <link rel='stylesheet' href='//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css' media="all">
+-->
+<link rel='stylesheet' type='text/css' href="@routes.Assets.at("stylesheets/cerulean.bootstrap.min.css")" media="all">
+
 <script type="text/javascript" src="@routes.Application.javascriptRoutes()"></script>
 <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-1.7.1.js")"></script>
 <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-play-1.7.1.js")"></script>
@@ -17,8 +20,8 @@
 </head>
 <body>
 
-<div class="navbar-nav navbar-fixed-top">
-    <div class="container">
+<div class="navbar transparent navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
       <a class="navbar-brand hidden-print" href="/"/>Flight Planner</a>
         <ul class="nav navbar-nav hidden-print">
           <li><a href="/places">Places</a></li>

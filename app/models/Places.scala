@@ -5,34 +5,6 @@ import play.api.Play.current
 import play.api.data.Forms._
 import math._
 
-case class Place(name: String, latitude: Double, longitude: Double, id: Option[Int] = None) {
-    def prettyLatitude = {
-        val latval = Math.abs(latitude)
-
-        val hemi = if (latitude >= 0) "N" else "S"
-        val degrees = latval.toInt
-        val minutes = ((latval%1)*60).toInt
-        val seconds = ((latval*60)%1)*60
-        degrees + "˚" + minutes + "'" + "%.2f".format(seconds) +"''" + hemi
-    }
-    def prettyLongitude = {
-        val longval = Math.abs(longitude)
-        val hemi = if (longitude >= 0) "E" else "W"
-      
-        val degrees = longval.toInt
-        val minutes = ((longval%1)*60).toInt
-        val seconds = ((longval*60)%1)*60
-        degrees + "˚" + minutes + "'" + "%.2f".format(seconds) +"''" + hemi
-    }
-    
-    def latR = latitude.toRadians
-    def longR = longitude.toRadians
-    
-    def initialBearing(to : Place) = {
-        atan2(sin(to.longR-longR)*cos(to.latR), 
-            cos(latR)*sin(to.latR)-sin(latR)*cos(to.latR)*cos(to.longR-longR)) 
-    }
-}
 class Places(tag: Tag) extends Table[Place](tag, "PLACES") {
   // Auto Increment the id primary key column
   def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)

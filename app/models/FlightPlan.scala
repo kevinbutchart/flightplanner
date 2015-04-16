@@ -26,6 +26,9 @@ case class Leg(journeyId: Int, from: Int, to: Int, id: Option[Int] = None) {
          0
      }
   }
+
+  def getPoints(intervalNm: Double, startOffset: Double) = f.getPoints(t, intervalNm, startOffset)
+
   
   def TrkT = (initialBearing.toDegrees + 360) % 360
   def TrkRelWindT = ((TrkT - Winds.find(2000).direction) %360)-180
@@ -65,6 +68,100 @@ object Legs {
 	def forJourney(choice: Int): List[Leg] = db.withSession { implicit session =>
 		legs.filter(_.journeyId === choice).list
 	}
+  def pointsForJourney(choice: Int) : List[Place] = {
+    var legs = forJourney(choice)
+    var p = List[Place]()
+    var e : Double = 0.0
+    for (l <- legs) {
+      var res = l.getPoints(1.0, e)
+      p = p ::: res._1
+      e = res._2
+    }
+    p
+  }
+
+
+  def closestMetarStations(choice: Int) : List[MetarStation] = {
+    var points = pointsForJourney(choice)
+    var minLat = 90.0
+    var maxLat = -90.0
+    var minLong = 360.0
+    var maxLong = -360.0
+    for (p <- points) {
+      if (p.latitude < minLat) { minLat = p.latitude}
+      if (p.latitude > maxLat) { maxLat = p.latitude}
+      if (p.longitude < minLong) { minLong = p.longitude}
+      if (p.longitude > maxLong) { maxLong = p.longitude}
+    }
+    minLat -= .5
+    maxLat += .5
+    minLong -= .5
+    maxLong += .5
+
+    var stations = MetarStations.allWith(minLat,maxLat,minLong,maxLong)
+    points.map(p => {
+      var minDist = 10000.0
+      var nearest : MetarStation = null
+      for (ms <- stations) {
+        val d = ms.place.distNm(p)
+
+        if (d < minDist) {
+          minDist = d
+          nearest = ms
+        }
+      }
+      nearest
+    })
+  }
+
+  def journeyCloudBases(choice: Int, samples: Int) : List[(String, Int,Int,Int,Int)] = {
+    val ms = closestMetarStations(choice);
+
+    if (ms.length > 0) {
+      val ret = new Array[(String, Int,Int,Int,Int)](samples)
+      for (ind <- 0 until samples) {
+        var msIndex = ((ms.length.toDouble/samples.toDouble)*ind).toInt
+        if (! (msIndex < ms.length)) {
+          msIndex = ms.length -1
+        }
+        val station = ms(msIndex)
+        if (station != null) {
+          val parsedMetar = station.getParsedMetar
+
+          var few = parsedMetar._6._1
+          var sct = parsedMetar._6._2
+          var bkn = parsedMetar._6._3
+          var ovc = parsedMetar._6._3
+          if (ovc == -1) ovc = 100
+          if (bkn == -1) bkn = ovc
+          if (sct == -1) sct = bkn
+          if (few == -1) few = sct
+
+
+          ovc *= 100
+          bkn *= 100
+          sct *= 100
+          few *= 100
+
+          ovc += station.elevation
+          bkn += station.elevation
+          sct += station.elevation
+          few += station.elevation
+
+          ret(ind) = (parsedMetar._1, few, sct, bkn, ovc)
+        } else {
+          ret(ind) = ("NONE", -1 , -1, -1, -1)
+        }
+      }
+      println(ret)
+      return ret.toList
+    } else {
+      return List[(String, Int,Int,Int,Int)]()
+    }
+  }
+
+
+
 	def create(newLeg: Leg) = db.withTransaction{ implicit session =>
 		legs += newLeg
 	}

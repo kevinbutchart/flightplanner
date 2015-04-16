@@ -1,5 +1,16 @@
 @(choice : Int)
 
+
+<style>
+    html, body, #map-canvas {
+    height: 100%;
+    margin: 0px;
+    padding: 0px
+    }
+</style>
+<script src="https://www.google.com/jsapi"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+
 <script>
 function reloadFunction(s) {
     var newChoice = s[s.selectedIndex].value;
@@ -74,7 +85,8 @@ function reloadFunction(s) {
 				</tr>
 				}
 			</tbody>
-		</table>
+
+     	</table>
 
 		</div>
 
@@ -104,10 +116,169 @@ function reloadFunction(s) {
 				    </tr>
                 }
 			</tbody>
+
+
 		</table>
 
 	</div>
     <p class="hidden-print">
 	<a href="@routes.FlightPlanController.addWind" class="btn btn-primary">Add/Change Wind</a>
-	</p
+	</p>
+
+
+<script>
+var elevator;
+var map;
+var chart;
+var polyline;
+
+// The following path marks a general path from Mt.
+// Whitney, the highest point in the continental United
+// States to Badwater, Death Valley, the lowest point.
+var path = []
+var lastPos = new google.maps.LatLng(52.0, -0.5);
+@for(point <- Legs.pointsForJourney(choice)) {
+    path.push(new google.maps.LatLng(@point.latitude,@point.longitude));
 }
+//path.push(lastPos);
+
+//var whitney = new google.maps.LatLng(36.578581, -118.291994);
+var lonepine = new google.maps.LatLng(36.606111, -118.062778);
+//var owenslake = new google.maps.LatLng(36.433269, -117.950916);
+//var beattyjunction = new google.maps.LatLng(36.588056, -116.943056);
+//var panamintsprings = new google.maps.LatLng(36.339722, -117.467778);
+//var badwater = new google.maps.LatLng(36.23998, -116.83171);
+
+// Load the Visualization API and the columnchart package.
+google.load('visualization', '1', {packages: ['corechart']});
+
+function initialize() {
+  var mapOptions = {
+    zoom: 9,
+    center: lastPos,
+    mapTypeId: 'terrain',
+    scrollwheel: false
+  }
+  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+  // Create an ElevationService.
+  elevator = new google.maps.ElevationService();
+
+  // Draw the path, using the Visualization API and the Elevation service.
+  drawPath();
+}
+
+function drawPath() {
+
+  // Create a new chart in the elevation_chart DIV.
+  chart = new google.visualization.AreaChart(document.getElementById('elevation_chart'));
+
+  //var path = [ whitney, lonepine, owenslake, panamintsprings, beattyjunction, badwater];
+
+  // Create a PathElevationRequest object using this array.
+  // Ask for 256 samples along that path.
+  var pathRequest = {
+    'path': path,
+    'samples': 256
+  }
+
+  // Initiate the path request.
+  elevator.getElevationAlongPath(pathRequest, plotElevation);
+}
+
+// Takes an array of ElevationResult objects, draws the path on the map
+// and plots the elevation profile on a Visualization API ColumnChart.
+function plotElevation(results, status) {
+  if (status != google.maps.ElevationStatus.OK) {
+    return;
+  }
+  var elevations = results;
+
+  // Extract the elevation samples from the returned results
+  // and store them in an array of LatLngs.
+  var elevationPath = [];
+  for (var i = 0; i < results.length; i++) {
+    elevationPath.push(elevations[i].location);
+  }
+
+  // Display a polyline of the elevation path.
+  var pathOptions = {
+    path: elevationPath,
+    strokeColor: '#00CC00',
+    opacity: 0.4,
+    map: map
+  }
+  polyline = new google.maps.Polyline(pathOptions);
+
+  // Extract the data from which to populate the chart.
+  // Because the samples are equidistant, the 'Sample'
+  // column here does double duty as distance along the
+  // X axis.
+
+  var nms = []
+  var few = []
+  var sct = []
+  var bkn = []
+  var ovc = []
+
+  @for(h <- Legs.journeyCloudBases(choice, 256)) {
+    nms.push("@h._1");
+    few.push(@h._2);
+    sct.push(@h._3);
+    bkn.push(@h._4);
+    ovc.push(@h._5);
+  }
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Sample');
+  data.addColumn('number', 'Elevation');
+  data.addColumn('number', 'Few');
+  data.addColumn({type: 'string', role: 'tooltip'});
+  data.addColumn('number', 'Sct');
+  data.addColumn({type: 'string', role: 'tooltip'});
+  data.addColumn('number', 'Bkn');
+  data.addColumn({type: 'string', role: 'tooltip'});
+  data.addColumn('number', 'Ovc');
+  data.addColumn({type: 'string', role: 'tooltip'});
+
+  for (var i = 0; i < results.length; i++) {
+    var elev = elevations[i].elevation * 3.2808399;
+    var f = few[i] - elev;
+    var fs = nms[i] +': Few at ' + few[i]
+    var s = sct[i] - few[i]
+    var ss = nms[i] +': Scattered at ' + sct[i]
+    var b = bkn[i] - sct[i]
+    var bs = nms[i] +': Broken at ' + bkn[i]
+    var o = ovc[i] - bkn[i]
+    var os = nms[i] +': Overcast at ' + ovc[i]
+    data.addRow([nms[i], elev,f,fs,s,ss,b,bs,o,os ]);
+  }
+
+  // Draw the chart using the data within its DIV.
+  document.getElementById('elevation_chart').style.display = 'line';
+  chart.draw(data, {
+    height: 500,
+    titleY: 'Elevation (feet)',
+    colors: ['#007700','#00E0E0', '#A0E0E0', '#A0A0A0', '#505050'],
+    isStacked: true,
+    vAxis: {
+        viewWindow: {
+            min: 0,
+            max: 5000
+        },
+        ticks: [0, 1000, 2000, 3000, 4000] // display labels every 25
+    }
+  });
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+
+}
+
+<p style="page-break-after:always;"></p>
+
+<div>
+    <div id="map-canvas"  style="height:500px;width:80%;left:10%;"></div>
+    <div id="elevation_chart"></div>
+</div>
