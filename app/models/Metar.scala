@@ -64,7 +64,7 @@ object MetarStations {
       //val stations = scala.io.Source.fromURL("https://www.aviationweather.gov/docs/metar/stations.txt").getLines
       //val stations = scala.io.Source.fromURL("/public/stations.txt").getLines
       //val stations = Play.resource("stations.txt")
-      val stations = scala.io.Source.fromFile(Play.application().getFile("public/stations.txt")).getLines
+      val stations = scala.io.Source.fromFile(Play.application().getFile("assets/stations.txt")).getLines
       for (s <- stations) {
         if (s.length==83) {
           val name = s.substring(3,19)
