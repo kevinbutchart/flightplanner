@@ -131,7 +131,7 @@ object Legs {
           var few = parsedMetar._6._1
           var sct = parsedMetar._6._2
           var bkn = parsedMetar._6._3
-          var ovc = parsedMetar._6._3
+          var ovc = parsedMetar._6._4
           if (ovc == -1) ovc = 100
           if (bkn == -1) bkn = ovc
           if (sct == -1) sct = bkn
