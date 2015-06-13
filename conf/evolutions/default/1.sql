@@ -34,9 +34,9 @@ insert into "WINDS" ("ALTITUDE", "DIR", "SPEED", "OAT") values (5000, 210, 20, -
 insert into "JOURNEYS" ("NAME") values ('Unnamed')
 # --- !Downs
 
-drop table "WINDS";
-drop table "PLACES";
-drop table "JOURNEY_LEGS";
-drop table "JOURNEYS";
-drop table "METARSTATIONS"
+# drop table "WINDS";
+# drop table "PLACES";
+# drop table "JOURNEY_LEGS";
+# drop table "JOURNEYS";
+# drop table "METARSTATIONS"
 
