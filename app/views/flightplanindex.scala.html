@@ -137,17 +137,10 @@ var polyline;
 // States to Badwater, Death Valley, the lowest point.
 var path = []
 var lastPos = new google.maps.LatLng(52.0, -0.5);
+
 @for(point <- Legs.pointsForJourney(choice)) {
     path.push(new google.maps.LatLng(@point.latitude,@point.longitude));
 }
-//path.push(lastPos);
-
-//var whitney = new google.maps.LatLng(36.578581, -118.291994);
-var lonepine = new google.maps.LatLng(36.606111, -118.062778);
-//var owenslake = new google.maps.LatLng(36.433269, -117.950916);
-//var beattyjunction = new google.maps.LatLng(36.588056, -116.943056);
-//var panamintsprings = new google.maps.LatLng(36.339722, -117.467778);
-//var badwater = new google.maps.LatLng(36.23998, -116.83171);
 
 // Load the Visualization API and the columnchart package.
 google.load('visualization', '1', {packages: ['corechart']});
@@ -166,14 +159,56 @@ function initialize() {
 
   // Draw the path, using the Visualization API and the Elevation service.
   drawPath();
+
+  var stations = [];
+
+   @for(ms <- Legs.stationsInArea(Legs.pointsForJourney(choice))) {
+        var obj = {
+            latitude : @ms.latitude,
+            longitude : @ms.longitude,
+            name : "@ms.name",
+            icao : "@ms.icao",
+            detail : "@ms.getMetar"
+        }
+        stations.push(obj);
+   }
+
+   var infowindow = null;
+
+   for (var i=0;i<stations.length;i++) {
+       var ms = stations[i];
+
+
+
+      var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(ms.latitude, ms.longitude),
+          map: map,
+          title: ms.name,
+          html : '<div id="content">'+
+          "<h3>" + ms.name+ "(" + ms.icao + ")</h3>" +
+          '<div id="bodyContent">'+
+          ms.detail +
+          '</div>'+
+          '</div>'
+      });
+      google.maps.event.addListener(marker, 'click', function() {
+        if (infowindow != null) {
+            infowindow.close();
+        }
+        infowindow = new google.maps.InfoWindow({
+          content: 'holding'
+        });
+        infowindow.content = this.html;
+        infowindow.open(map, this);
+      });
+  }
+
 }
 
 function drawPath() {
 
   // Create a new chart in the elevation_chart DIV.
   chart = new google.visualization.AreaChart(document.getElementById('elevation_chart'));
-
-  //var path = [ whitney, lonepine, owenslake, panamintsprings, beattyjunction, badwater];
 
   // Create a PathElevationRequest object using this array.
   // Ask for 256 samples along that path.
@@ -204,7 +239,7 @@ function plotElevation(results, status) {
   // Display a polyline of the elevation path.
   var pathOptions = {
     path: elevationPath,
-    strokeColor: '#00CC00',
+    strokeColor: '#0000CC',
     opacity: 0.4,
     map: map
   }
@@ -215,18 +250,21 @@ function plotElevation(results, status) {
   // column here does double duty as distance along the
   // X axis.
 
+  var mst = []
   var nms = []
   var few = []
   var sct = []
   var bkn = []
   var ovc = []
+  var lastpl = "";
 
   @for(h <- Legs.journeyCloudBases(choice, 256)) {
-    nms.push("@h._1");
-    few.push(@h._2);
-    sct.push(@h._3);
-    bkn.push(@h._4);
-    ovc.push(@h._5);
+    mst.push("@h._1");
+    nms.push("@h._2");
+    few.push(@h._3);
+    sct.push(@h._4);
+    bkn.push(@h._5);
+    ovc.push(@h._6);
   }
   var data = new google.visualization.DataTable();
   data.addColumn('string', 'Sample');
@@ -240,22 +278,26 @@ function plotElevation(results, status) {
   data.addColumn('number', 'Ovc');
   data.addColumn({type: 'string', role: 'tooltip'});
 
+  var lastname = "";
   for (var i = 0; i < results.length; i++) {
     var elev = elevations[i].elevation * 3.2808399;
     var f = few[i] - elev;
-    var fs = nms[i] +': Few at ' + few[i]
+    var fs = mst[i] +': Few at ' + few[i]
     var s = sct[i] - few[i]
-    var ss = nms[i] +': Scattered at ' + sct[i]
+    var ss = mst[i] +': Scattered at ' + sct[i]
     var b = bkn[i] - sct[i]
-    var bs = nms[i] +': Broken at ' + bkn[i]
+    var bs = mst[i] +': Broken at ' + bkn[i]
     var o = ovc[i] - bkn[i]
-    var os = nms[i] +': Overcast at ' + ovc[i]
-    data.addRow([nms[i], elev,f,fs,s,ss,b,bs,o,os ]);
+    var os = mst[i] +': Overcast at ' + ovc[i]
+    var nm = nms[i]
+
+    data.addRow([ nm, elev,f,fs,s,ss,b,bs,o,os ]);
   }
 
   // Draw the chart using the data within its DIV.
   document.getElementById('elevation_chart').style.display = 'line';
   chart.draw(data, {
+    backgroundColor: '#dddddd',
     height: 500,
     titleY: 'Elevation (feet)',
     colors: ['#007700','#00E0E0', '#A0E0E0', '#A0A0A0', '#505050'],
@@ -266,7 +308,8 @@ function plotElevation(results, status) {
             max: 5000
         },
         ticks: [0, 1000, 2000, 3000, 4000] // display labels every 25
-    }
+    },
+    'hAxis': {'slantedText': false}
   });
 }
 
@@ -279,6 +322,10 @@ google.maps.event.addDomListener(window, 'load', initialize);
 <p style="page-break-after:always;"></p>
 
 <div>
-    <div id="map-canvas"  style="height:500px;width:80%;left:10%;"></div>
-    <div id="elevation_chart"></div>
+    <div id="map-canvas"  style="height:500px;width:80%;left:10%;bottom:10%"></div>
+    <br>
+    <div id="border" style="height:500px;width:80%;top:10%;left:10%;display:block;margin: 0 auto">
+    <div id="elevation_chart" ></div>
+
+    </div>
 </div>

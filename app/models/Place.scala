@@ -45,7 +45,7 @@ case class Place(name: String, latitude: Double, longitude: Double, id: Option[I
         Math.cos(latR)*Math.sin(dR)*Math.cos(bearing) )
       var longDstR = longR + math.atan2(math.sin(bearing)*math.sin(dR)*Math.cos(latR),
         Math.cos(dR)-math.sin(latR)*math.sin(to.latR))
-      Place("",latDstR.toDegrees,longDstR.toDegrees)
+      Place(name,latDstR.toDegrees,longDstR.toDegrees)
     }
 
     def getPoints(to: Place, intervalNm: Double, startOffsetNm: Double) : (List[Place], Double) =
@@ -54,7 +54,9 @@ case class Place(name: String, latitude: Double, longitude: Double, id: Option[I
       var point = startOffsetNm
       var list = List[Place]()
       while (point < dist) {
-         val p = PointOnWay(to, point)
+
+        val p = PointOnWay(to, point)
+
          list = list :+ p
          point += intervalNm
       }

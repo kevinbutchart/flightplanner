@@ -80,9 +80,7 @@ object Legs {
     p
   }
 
-
-  def closestMetarStations(choice: Int) : List[MetarStation] = {
-    var points = pointsForJourney(choice)
+  def stationsInArea(points : List[Place]) : List[MetarStation] = {
     var minLat = 90.0
     var maxLat = -90.0
     var minLong = 360.0
@@ -98,7 +96,12 @@ object Legs {
     minLong -= .5
     maxLong += .5
 
-    var stations = MetarStations.allWith(minLat,maxLat,minLong,maxLong)
+    MetarStations.allWith(minLat,maxLat,minLong,maxLong)
+  }
+
+
+  def closestMetarStations(points : List[Place]) : List[MetarStation] = {
+    var stations = stationsInArea(points : List[Place])
     points.map(p => {
       var minDist = 10000.0
       var nearest : MetarStation = null
@@ -114,11 +117,13 @@ object Legs {
     })
   }
 
-  def journeyCloudBases(choice: Int, samples: Int) : List[(String, Int,Int,Int,Int)] = {
-    val ms = closestMetarStations(choice);
+  def journeyCloudBases(choice: Int, samples: Int) : List[(String, String, Int,Int,Int,Int)] = {
+    var points = pointsForJourney(choice)
+    val ms = closestMetarStations(points)
+    var parray = points.toArray
 
     if (ms.length > 0) {
-      val ret = new Array[(String, Int,Int,Int,Int)](samples)
+      val ret = new Array[(String, String, Int,Int,Int,Int)](samples)
       for (ind <- 0 until samples) {
         var msIndex = ((ms.length.toDouble/samples.toDouble)*ind).toInt
         if (! (msIndex < ms.length)) {
@@ -148,15 +153,15 @@ object Legs {
           sct += station.elevation
           few += station.elevation
 
-          ret(ind) = (parsedMetar._1, few, sct, bkn, ovc)
+          ret(ind) = (parsedMetar._1, parray(msIndex).name, few, sct, bkn, ovc)
         } else {
-          ret(ind) = ("NONE", -1 , -1, -1, -1)
+          ret(ind) = ("NONE","NONE", -1 , -1, -1, -1)
         }
       }
       println(ret)
       return ret.toList
     } else {
-      return List[(String, Int,Int,Int,Int)]()
+      return List[(String, String, Int,Int,Int,Int)]()
     }
   }
 

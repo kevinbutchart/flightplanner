@@ -35,7 +35,6 @@ th {
     select {
         height:30px;
         line-height:30px;
-        background:#f4f4f4;
     }
 }
 select::-moz-focus-inner { /*Remove button padding in FF*/

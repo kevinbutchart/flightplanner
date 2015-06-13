@@ -15,7 +15,7 @@ import utils._
 case class MetarStation(latitude: Double, longitude : Double, icao : String,name :String, elevation: Int, id : Option[Int] = None) {
   def place = Place(icao, latitude, longitude)
 
-  var metarDetail = ""
+  var metarDetail = getMetar
   var metarLastRead = 0L
   def getMetar : String = {
     if (System.currentTimeMillis - metarLastRead > 1000 * 60 *15)
