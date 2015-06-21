@@ -31,7 +31,7 @@ case class Leg(journeyId: Int, from: Int, to: Int, id: Option[Int] = None) {
 
   
   def TrkT = (initialBearing.toDegrees + 360) % 360
-  def TrkRelWindT = ((TrkT - Winds.find(2000).direction) %360)-180
+  def TrkRelWindT = (((TrkT - Winds.find(2000).direction)+360.0) %360)-180
   def AngleIntoWind = (asin(Winds.find(2000).speed * sin(TrkRelWindT.toRadians)/Winds.find(2000).tas)).toDegrees
   def HdgT = Bearing.normalise(TrkT + AngleIntoWind)
   def Var = 2
